@@ -1,8 +1,8 @@
 # 🎾 Asistente Experto en Reglamentos de Tenis (RAG + Agente con Gemini)
 
-[![CI](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/ci.yml/badge.svg)](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/ci.yml)
-[![Health check](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/healthcheck.yml/badge.svg)](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/healthcheck.yml)
-[![Abrir en Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://proyectoiagen.streamlit.app/)
+[![CI](https://github.com/Joteiro/tennis-rag-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Joteiro/tennis-rag-agent/actions/workflows/ci.yml)
+[![Health check](https://github.com/Joteiro/tennis-rag-agent/actions/workflows/healthcheck.yml/badge.svg)](https://github.com/Joteiro/tennis-rag-agent/actions/workflows/healthcheck.yml)
+[![Abrir en Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tennis-agent.streamlit.app//)
 
 Proyecto final del módulo de **IA Generativa** (Máster en Data Science, Evolve).
 
@@ -14,7 +14,7 @@ las *Reglas del Tenis de la ITF 2026* como fuente de respaldo.
 
 ### 🌐 App en vivo
 
-**Probá el asistente desplegado:** **https://proyectoiagen.streamlit.app/**
+**Probá el asistente desplegado:** **https://tennis-agent.streamlit.app//**
 
 > Nota: usa el free tier de Gemini/Groq; si la app estuvo inactiva, la primera
 > pregunta puede tardar unos segundos mientras indexa los reglamentos.
@@ -62,7 +62,7 @@ Código organizado como fuente única de verdad en `src/`, reutilizado tanto por
 notebook como por la app de Streamlit:
 
 ```
-proyecto_IA_gen/
+tennis-rag-agent/
 ├── data/                       # los dos PDFs
 ├── src/
 │   ├── config.py               # rutas, modelos, carga de API key
