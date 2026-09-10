@@ -33,6 +33,15 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
 # Modelo de chat según proveedor. Groq deprecó la línea Llama 3.x; usamos el
 # modelo abierto de OpenAI servido por Groq, que soporta tool-calling.
 GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+
+# Modelos de respaldo (con tool-calling) para AUTO-RECUPERACIÓN: si el modelo
+# configurado deja de estar disponible en Groq, el agente cae al primero de esta
+# lista que siga vivo, en vez de romperse. Ver src/agent.py::_resolver_modelo_groq.
+GROQ_MODEL_FALLBACKS = [
+    "openai/gpt-oss-120b",
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
+]
 CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash-lite")
 
 # Embeddings de Gemini (cuota separada de la de chat).

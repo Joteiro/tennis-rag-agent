@@ -1,23 +1,29 @@
+# Versiones con tope de "major" para evitar que una actualización con cambios
+# incompatibles rompa el proyecto en silencio. El CI y el health check validan
+# que el conjunto siga funcionando.
+
 # Núcleo LLM + Embeddings (Google Gemini para embeddings)
-langchain-google-genai>=2.0.0
+langchain-google-genai>=4.2,<5
 
 # LLM de chat alternativo (Groq: free tier amplio) — LLM_PROVIDER=groq
-langchain-groq>=0.2.0
+langchain-groq>=1.1,<2
+groq>=0.37,<1
 
 # Framework de agente
-langchain>=0.3.0
-langchain-community>=0.3.0
-langgraph>=0.2.50
+langchain>=1.3,<2
+langchain-core>=1.4,<2
+langchain-text-splitters>=1.1,<2
+langgraph>=1.2,<2
 
 # Base de conocimiento vectorial
-langchain-chroma>=0.1.4
-chromadb>=0.5.0
+langchain-chroma>=1.1,<2
+chromadb>=1.5,<2
 
 # Carga y troceado de PDFs
-pypdf>=5.0.0
+pypdf>=6,<7
 
 # Configuración
-python-dotenv>=1.0.0
+python-dotenv>=1,<2
 
 # Interfaz web (bonus)
-streamlit>=1.40.0
+streamlit>=1.40,<2

@@ -1,5 +1,9 @@
 # 🎾 Asistente Experto en Reglamentos de Tenis (RAG + Agente con Gemini)
 
+[![CI](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/ci.yml/badge.svg)](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/ci.yml)
+[![Health check](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/healthcheck.yml/badge.svg)](https://github.com/Joteiro/proyecto_IA_gen/actions/workflows/healthcheck.yml)
+[![Abrir en Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://proyectoiagen.streamlit.app/)
+
 Proyecto final del módulo de **IA Generativa** (Máster en Data Science, Evolve).
 
 Un agente conversacional que responde dudas sobre el **Ranking Federado del
@@ -142,6 +146,44 @@ Ver [`requirements.txt`](requirements.txt). Principales: `langchain`,
 `python-dotenv`, `streamlit`.
 
 ---
+
+## 🔧 MLOps y robustez
+
+El sistema depende de servicios externos (modelos de Groq y Gemini) que pueden
+cambiar sin aviso —de hecho, Groq deprecó un modelo en pleno uso—. Para que eso no
+rompa el proyecto en silencio hay una capa de robustez y monitoreo:
+
+- **Auto-recuperación de modelo.** Al arrancar, el agente verifica que el modelo de
+  Groq configurado siga disponible; si fue deprecado, **cae automáticamente** a un
+  modelo de respaldo (`src/agent.py::_resolver_modelo_groq`). La app no se cae.
+- **Manejo de errores transitorios.** `preguntar()` reintenta ante 429/503 (cuota o
+  sobrecarga) con back-off; la app muestra un mensaje legible si algo falla.
+- **Health check** (`scripts/healthcheck.py`): valida keys, disponibilidad de
+  modelos, embeddings y una consulta de punta a punta. Corrélo con
+  `python scripts/healthcheck.py` (exit 0 = todo OK).
+- **Monitoreo automático (GitHub Actions).**
+  - `ci.yml` — en cada push corre los *smoke tests* (`tests/`): valida que el grafo
+    de imports y la lógica sigan sanos, sin consumir APIs.
+  - `healthcheck.yml` — cron **semanal** (y manual) que corre el health check con
+    APIs reales; si falla, **abre/actualiza un Issue** y GitHub avisa por email.
+- **Dependencias con tope de *major*** (`requirements.txt`): una actualización con
+  cambios incompatibles no puede romper el deploy en silencio.
+
+### Para activar el monitoreo (una sola vez)
+
+En **Settings ▸ Secrets and variables ▸ Actions** del repo, agregá dos secrets:
+`GOOGLE_API_KEY` y `GROQ_API_KEY`. Sin ellos, el workflow de health check se omite
+solo (no genera falsas alertas).
+
+### Consideraciones conocidas
+
+- **Arranque en frío en Streamlit:** la app reindexa los reglamentos en memoria al
+  despertar, consumiendo cuota de *embeddings* de Gemini (finita por día). Para
+  tráfico bajo no es problema, y el health check avisaría si la cuota se agota. Para
+  un despliegue 100 % independiente de cuota, se pueden usar embeddings locales de
+  HuggingFace (mayor consumo de memoria en el contenedor).
+- **Versión de Python del deploy:** Streamlit elige la versión en *Advanced
+  settings*. El CI valida en **3.12**; se recomienda fijar la misma allí para paridad.
 
 ## ⚠️ Notas
 

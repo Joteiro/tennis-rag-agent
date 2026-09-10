@@ -16,12 +16,40 @@ from langgraph.prebuilt import create_react_agent
 from . import config
 
 
+def _resolver_modelo_groq(preferido: str) -> str:
+    """Auto-recuperación: devuelve un modelo Groq que esté DISPONIBLE ahora mismo.
+
+    Consulta la lista de modelos de la cuenta. Si el ``preferido`` sigue vivo, lo
+    usa; si fue deprecado, cae al primer respaldo disponible de
+    ``config.GROQ_MODEL_FALLBACKS``. Si no se puede consultar la lista (sin red),
+    devuelve el preferido y deja que la llamada falle de forma normal.
+    """
+    import os
+
+    try:
+        from groq import Groq
+
+        disponibles = {m.id for m in Groq(api_key=os.environ["GROQ_API_KEY"]).models.list().data}
+    except Exception:  # noqa: BLE001 - sin conectividad/lista: intentamos con el preferido
+        return preferido
+
+    if preferido in disponibles:
+        return preferido
+    for alt in config.GROQ_MODEL_FALLBACKS:
+        if alt in disponibles:
+            print(f"⚠️ Modelo Groq '{preferido}' no disponible; usando respaldo '{alt}'.")
+            return alt
+    print(f"⚠️ Ni '{preferido}' ni los respaldos están disponibles en Groq.")
+    return preferido
+
+
 def _crear_llm():
     """Instancia el LLM de chat según ``config.LLM_PROVIDER`` (groq o gemini)."""
     if config.LLM_PROVIDER == "groq":
         from langchain_groq import ChatGroq
 
-        return ChatGroq(model=config.GROQ_MODEL, temperature=0)
+        modelo = _resolver_modelo_groq(config.GROQ_MODEL)
+        return ChatGroq(model=modelo, temperature=0)
     from langchain_google_genai import ChatGoogleGenerativeAI
 
     return ChatGoogleGenerativeAI(model=config.CHAT_MODEL, temperature=0)

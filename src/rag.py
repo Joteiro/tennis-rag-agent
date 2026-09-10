@@ -14,10 +14,10 @@ import time
 from pathlib import Path
 
 from langchain_chroma import Chroma
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from pypdf import PdfReader
 
 from . import config
 
@@ -61,9 +61,23 @@ def _add_documentos_por_lotes(vs: Chroma, docs: list[Document], batch: int = 50)
             raise RuntimeError("No se pudo indexar tras varios reintentos (cuota de Gemini).")
 
 
+def _cargar_paginas(pdf_path: Path) -> list[Document]:
+    """Lee un PDF con pypdf y devuelve un Document por página con texto."""
+    reader = PdfReader(str(pdf_path))
+    paginas = []
+    for i, page in enumerate(reader.pages):
+        texto = page.extract_text() or ""
+        if texto.strip():
+            paginas.append(Document(
+                page_content=texto,
+                metadata={"page": i, "source": pdf_path.name},
+            ))
+    return paginas
+
+
 def _cargar_y_trocear(pdf_path: Path, fuente: str) -> list[Document]:
     """Carga un PDF, lo trocea y etiqueta cada fragmento con su fuente."""
-    paginas = PyPDFLoader(str(pdf_path)).load()
+    paginas = _cargar_paginas(pdf_path)
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=config.CHUNK_SIZE,
         chunk_overlap=config.CHUNK_OVERLAP,
